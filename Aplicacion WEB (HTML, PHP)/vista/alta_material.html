@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+  <title>MATERIALES</title>
+  <!--========================================================== -->
+  <!-- ENCABEZADO -->
+  <!--========================================================== 
+  <header class="container-fluid bg-primary d-flex justify-content-center">
+    <p class="text-light mb-0 p-2 fs-6">INVENTARIO DE FUNDAS</p>
+</header>-->
+
+  <nav class="navbar navbar-expand-lg navbar-light p-3" id="menu">
+    <div class="container">
+      <a class="navbar-brand" href="#">
+        <span class="fs-5 text-primary fw-bold">FundasMx</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" aria-current="page" href="alta_producto.html">Productos</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="alta_proveedor.html">Proveedores</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="alta_material.html">Materiales</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="alta_modelo_celular.html">Modelo de Celular</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="alta_usuario.html">Usuarios</a>
+          </li>
+        </ul>
+      
+        <!--<form class="d-flex">
+          <input class="form-control me-2" type="email" placeholder="Correo Electronico" aria-label="Suscribete">
+          <button class="btn btn-primary btn-primary-outline-success" type="button">Suscribete</button>
+        </form>-->
+      </div>
+
+    </div>
+  </nav>
+</head>
+</head>
+
+<body>
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <br>
+      </div>
+      <div class="container mt-4">
+        <div class="row">
+          <div class="col-md-3">
+            <h2>Ingrese datos</h2>
+
+            <form>
+              <table>
+
+                  <td><input type="text" class="form-control mb-3" id="tipo_material" placeholder="Tipo Material"></td>
+                </tr>
+                <tr>
+                  <td><input type="text" class="form-control mb-3" id="cantidad" placeholder="Cantidad"></td>
+                </tr>
+                <tr>
+                  <td><select name="id_proveedor_fk" id="id_proveedor_fk" class="form-control id_proveedor_fk">
+                    <option selected> Seleccione el proveedor</option>
+                    </select>
+                   </td>
+                </tr>
+                <br>
+
+                <tr>
+                <tr>
+
+                  <td>
+                    <input type="button" class="btn btn-primary" value="Registrar" id="btA">
+
+                  </td>
+                </tr>
+
+              </table>
+            </form>
+          </div>
+
+          <div class="col-md-8">
+               
+            <button type="button"  onclick="getMostrar()"
+            class="btn btn-primary">Mostrar Materiales</button>
+             <div class="row" id="mostrarArt"></div>
+        </div>
+  
+          
+          <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+
+
+</body>
+<script>
+
+  $('#btA').click(function () {
+    //cuando creamos un objeto de tipo articulo
+    var js_obj = {
+      "tipo_material": $('#tipo_material').val(),
+      "cantidad": $('#cantidad').val(),
+      "id_proveedor_fk": $('#id_proveedor_fk').val()
+
+    };
+    var texto = JSON.stringify(js_obj);
+    var dato = texto;
+    $.ajax({
+      data: dato,
+      url: 'http://localhost/alsa_dwi_9ids1/controlador/apis/create_material.php',
+      type: "POST",
+      success: function (resp) { }
+    })
+    location.assign("alta_material.html");
+  });
+
+  function getMostrar(){
+          $.ajax({
+             type:'GET',
+             url:'http://localhost:8083/alsa_dwi_9ids1/controlador/apis/read_materiales.php',
+             dataType: 'JSON'
+         }).done(function(resp){
+             let cadena="";
+             for(datos of resp){
+                 cadena +=
+          '<div class="col-md-3" style="margin-top:5px">'+
+         '<div class="card">'+
+        '<h5 class="card-header">'+datos.tipo_material+'</h5>'+
+   ' <a href="consulta_material.php?id_material='+datos.id_material+
+   '" class="btn btn-primary">VER</a>'+
+  '</div>'+
+'</div></div>';
+             }//for
+             document.getElementById("mostrarArt").innerHTML = cadena;
+         });
+      }//getMostrar
+</script>
+
+<script>
+  $(document).ready(function() {
+     
+      llenar_proveedor();
+  });
+  const llenar_proveedor = () => {
+      $.ajax({
+          type: "GET",
+          url: "http://localhost:8083/ALSA_DWI_9IDS1/controlador/apis/read_proveedores.php",
+          async: false,
+          dataType: "json",
+          success: function(data) {
+              //console.log('generos: ',data)
+              $.each(data, function(key, registro) {
+                  var id = registro.id_proveedor;
+                  var nombre = registro.razon_social;
+                  $(".id_proveedor_fk").append('<option value=' + id + '>' + nombre + '</option>');
+              });
+          },
+          error: function(data) {
+              console.log(data);
+          }
+      });
+  }
+</script>
+
+</html>
